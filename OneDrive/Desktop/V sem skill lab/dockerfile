@@ -1,0 +1,27 @@
+# Use a node image to build the app
+FROM node:14 AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy the package.json and install dependencies
+COPY package.json ./
+RUN npm install
+
+# Copy the rest of the application files
+COPY . .
+
+# Since this is a static HTML/JS/CSS app, there's no build command, so we skip npm run build
+# You could add any preprocessing tasks here if needed
+
+# Use nginx to serve the static content
+FROM nginx:alpine
+
+# Copy static files from builder stage to nginx html folder
+COPY . /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
